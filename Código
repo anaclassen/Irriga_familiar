@@ -1,0 +1,274 @@
+#include <ESP8266WiFi.h>   //WiFi
+#include <PubSubClient.h>  //MQTT
+#include <ADS1115_WE.h>    //Conversor analogico digital
+#include <ArduinoJson.h>   //TAGO IO serializacao e deserializacao para Json
+#include <DHT.h>           //sensor temperatura/umidade
+#include <time.h>          //data e hora
+#define DHTPIN 2    // Digital D4 GPIO 2
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+#define LED1 16     //GPIO 16 é o D0 LED Verde
+#define LED2 0      //GPIO 0 é o D3 LED Vermelho
+#define VALVULA 14  //GPIO 14 é o D5
+#define I2C_ADDRESS 0x48
+ADS1115_WE adc(I2C_ADDRESS);  //Conexao através do SCL pino D1 e SDA pino D2
+
+//Wifi --- FUNCIONANDO
+const char* SSID = "ELANDRO 2.4G CLARO";
+const char* password = "16594Spock";
+
+//MQTT
+const char *ID = "Irrigacao";                  //nome do dispositivo TAGO IO
+const char *BROKER_MQTT = "mqtt.tago.io";      //Broker tago IO
+unsigned int PORT = 8883;
+const char *TOKEN = "d50aee27-4d1f-4663-835f-e8dcd823f034"; //TAGO IO dispositivo
+const char *USER = "MQTT_Irriga";
+BearSSL::WiFiClientSecure espMQTT;
+PubSubClient MQTT(espMQTT);
+
+const char *TopicsToPublish[] = { "data", "info"};  //TAGO IO
+unsigned long previousMillis = 0;
+unsigned long previousIrrigacao = 0;
+String DeviceName = "TAGOioESP8266MQTT";
+float temperatura, umidade, AJUSTE;
+int TEMPO = 0, VOLUME = 0, media;
+float HIGRO_A1 = 0.0; //sensor Higrometro 1 conectado ao ADS1115
+float HIGRO_A2 = 0.0; //sensor Higrometro 2 conectado ao ADS1115
+long timezone = -3; //data e hora
+String sistema = "Aguarde...";
+String aviso, aviso2 = "Aguarde..."; //Mensagens de aviso do sensor Higrometro e da irrigação
+String DataIrriga, data, hora;
+int irrigacao = 0; //pico indicativo de irrigação
+
+//DHT
+void sendSensor() {
+    umidade = dht.readHumidity();
+    temperatura = dht.readTemperature();  
+    if (isnan(umidade) || isnan(temperatura)) {
+        Serial.println("\nFalha na leitura do sensor DHT!");
+        sistema = "Falha na leitura do sensor DHT!\n";
+      }
+    }
+//ADS1115
+float readChannel(ADS1115_MUX channel) {
+    float voltage = 0.0;
+    adc.setCompareChannels(channel);
+    voltage = adc.getResult_V();  //Ou getResult_mV para resultado em Millivolt
+    return voltage;
+  }
+void mantemConexoes() {   //Garante que as conexoes com WiFi e MQTT Broker se mantenham ativas
+    if (!WiFi.isConnected()) {
+      conectaWiFi(); //se não há conexão com o WiFI, a conexão é refeita
+    }
+    if (!MQTT.connected()) {  //se não conecta MQTT é refeita
+      conectaMQTT();
+    }
+  }
+void conectaWiFi() {      //Faz conexão com WiFi
+    delay(10);
+    Serial.print("\nConectando-se na rede: ");
+    Serial.print(SSID);
+    Serial.println("  Aguarde!");
+    WiFi.begin(SSID, password);  //Conecta na rede WI-FI
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.println("\nConectado com sucesso, na rede: ");
+    Serial.print(SSID);
+    Serial.print("  IP obtido: ");
+    Serial.println(WiFi.localIP());
+  }
+void conectaMQTT() {     //Faz conexão com Broker MQTT
+    while (!MQTT.connected()) {
+      Serial.println("\nConectando ao Broker MQTT: ");
+      MQTT.setServer(BROKER_MQTT, PORT);  // MQTT broker info
+      MQTT.setBufferSize(1024);
+      if (MQTT.connect(ID , USER , TOKEN)) {
+        Serial.println("\nConectado ao Broker com sucesso!");
+        for(int i=0; i<=((sizeof(TopicsToPublish) / sizeof(TopicsToPublish[0]))-1); i++){   //TAGO IO mostra no serial os topic de publicação
+          Serial.print("MQTT Client   : [ Publicando para ");
+          Serial.print(TopicsToPublish[i]);
+          Serial.println(" ]");
+          }
+      } else {
+        Serial.println("\nNao foi possivel se conectar ao broker.");
+        Serial.print(MQTT.state());
+        Serial.println("Nova tentatica de conexao em 5s");
+        delay(5000);
+      }
+    }
+  }
+//TAGO IO publish
+void SerializeAndPublish() {
+    char buffer[1024];            // JSON serialization 
+    StaticJsonDocument<1024> doc;  
+    JsonObject doc_0 = doc.createNestedObject();
+      doc_0["variable"] = "status";
+      doc_0["value"] =  aviso;
+    JsonObject doc_1 = doc.createNestedObject();
+      doc_1["variable"] = "HIGRO_A1";
+      doc_1["value"] =  HIGRO_A1;
+      doc_1["unit"] = "V";
+    JsonObject doc_2 = doc.createNestedObject();
+      doc_2["variable"] = "HIGRO_A2";
+      doc_2["value"] =  HIGRO_A2;
+      doc_2["unit"] = "V";
+    JsonObject doc_3 = doc.createNestedObject();
+      doc_3["variable"] = "temperatura";
+      doc_3["value"] =  temperatura;     
+      doc_3["unit"] = "°C";
+    JsonObject doc_4 = doc.createNestedObject();
+      doc_4["variable"] = "umidade";
+      doc_4["value"] = umidade;  
+      doc_4["unit"] = "%"; 
+    JsonObject doc_5 = doc.createNestedObject();
+      doc_5["variable"] = "ajuste";
+      doc_5["value"] = AJUSTE*20;  
+      doc_5["unit"] = "mL";
+    JsonObject doc_6 = doc.createNestedObject();
+      doc_6["variable"] = "tempo";
+      doc_6["value"] = TEMPO;  
+      doc_6["unit"] = "s";
+    //JsonObject doc_7 = doc.createNestedObject();
+    //  doc_7["variable"] = "irriga";
+    //  doc_7["value"] = aviso2;  
+    //JsonObject doc_8 = doc.createNestedObject();
+    //  doc_8["variable"] = "sistema";
+    //  doc_8["value"] = sistema;  
+    //JsonObject doc_9 = doc.createNestedObject();
+    //  doc_9["variable"] = "irrigacao";
+    //  doc_9["value"] = irrigacao;  
+    //JsonObject doc_10 = doc.createNestedObject();
+    //  doc_10["variable"] = "volume";
+    //  doc_10["value"] = VOLUME; 
+    //  doc_10["unit"] = " mL";
+    serializeJson(doc, buffer);
+      //Serial.printf("\nJSON Payload: \n");
+      //serializeJsonPretty(doc, Serial);        // Imprimi na porta serial o JSON payload        
+      //Serial.print("\n MQTT Client   : [ Enviando mensagem ao topico MQTT ]");
+    MQTT.publish(TopicsToPublish[0], buffer);  // Publish data to MQTT Broker 
+    }
+void AcionaValvula(){ //Ativo em LOW
+    digitalWrite(VALVULA, LOW);
+    Serial.print("Irrigação iniciada! ");
+    delay(TEMPO*1000); //5s + AJUSTE
+    digitalWrite(VALVULA, HIGH);
+    VOLUME = TEMPO*20; //em mL
+    String TempoDEC = String (VOLUME, DEC);
+    DataIrriga = "Data: " + data + " - Hora: " + hora;
+    aviso2 = "Última irrigação realizada - " + TempoDEC + "mL - " + DataIrriga;   
+    irrigacao = 4;  //indicação de irrigação no grafico
+    Serial.print (VOLUME);
+    Serial.print ("mL - ");
+    Serial.println (irrigacao);  
+  }
+void setup() {
+    Serial.begin(115200);
+    configTime(3600 * timezone, 0, "pool.ntp.org");
+    pinMode(LED1, OUTPUT);
+    pinMode(LED2, OUTPUT);
+    pinMode(VALVULA, OUTPUT);
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(VALVULA, HIGH);
+  //ADS1115
+    Wire.begin(); //biblio ADS chama a biblio wire 
+    if  (!adc.init()) {
+        Serial.println("\nADS1115 nao conectado!");
+        sistema = "ADS1115 nao conectado!";
+      }
+    adc.setVoltageRange_mV(ADS1115_RANGE_6144);
+    adc.setCompareChannels(ADS1115_COMP_3_GND);
+    adc.setMeasureMode(ADS1115_CONTINUOUS);
+    Serial.println("\nADS1115 com ESP8266 NodeMCU - Leitura continua\nTodos os valores em volts!\n");
+  dht.begin();
+  //Conexão WiFi e MQTT
+    conectaWiFi();  
+    espMQTT.setInsecure();  
+    conectaMQTT();        //Conecta MQTT Broker
+  SerializeAndPublish();
+  }
+void loop() {
+  delay(1000);
+  mantemConexoes();  
+  //data e hora
+      struct tm tmstruct ;
+      tmstruct.tm_year = 0;
+      getLocalTime(&tmstruct);
+      data = (((tmstruct.tm_year) + 1900) + "-" + String(tmstruct.tm_mday)+ "-" + String(( tmstruct.tm_mon) + 1));
+      hora = (String(tmstruct.tm_hour) + ":" + String(tmstruct.tm_min) + ":" + String(tmstruct.tm_sec));
+      //Serial.println("Data: " + data + " - Hora: " + hora);
+      sistema = "Rede: ";
+      sistema = sistema + SSID;
+      sistema = sistema + " Data: " + data + " - Hora: " + hora;
+      Serial.println(sistema);
+  //ADS1115
+      AJUSTE = readChannel(ADS1115_COMP_0_GND); //leitura canal A0 do ADS1115
+      Serial.print ("Ajuste ");
+      AJUSTE = AJUSTE * (10/3.3333); //0 a 10
+      Serial.print(AJUSTE);
+    //Leitura Higrometro 1
+      HIGRO_A1 = readChannel(ADS1115_COMP_1_GND); //leitura canal A1 do ADS1115 978 -> 3,3V
+      Serial.print (", HIGRO A1: ");
+      Serial.print (HIGRO_A1);
+    //Leitura Higrometro 2
+      HIGRO_A2 = readChannel(ADS1115_COMP_2_GND); //leitura canal A2 do ADS1115 978 -> 3,3V
+      Serial.print(", HIGRO A2: ");
+      Serial.println (HIGRO_A2);
+  //sensor higrometro ajustar parametros
+    if  (HIGRO_A1>=2.57 && HIGRO_A2>=2.57){  //(HIGRO_A1>=2.20 && HIGRO_A2>=2.20)
+        //Se a leitura for um valor >= 2.20 podemos definir que o solo está com uma baixa condutividade, logo a planta deve ser regada
+        aviso = "Nível de Umidade Baixo";
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, HIGH);
+        unsigned long tempoIrrigacao = millis();          //millis inicia contagem
+        if  (tempoIrrigacao - previousIrrigacao >= 600*1000) { //se millis - tempo anterior >= 10 min 600s ele entra no if, ou seja, o if será true a cada 60s
+            previousIrrigacao = tempoIrrigacao; 
+            TEMPO = 5 + AJUSTE; //tempo com a válvula ligada
+            AcionaValvula();           
+        }
+      }
+    else  {
+        //Se a leitura for maior ou igual a 1.10 e menor que 2.20V podemos definir nível médio de umidade, logo pode ou não ser vantajoso regar
+        if  (HIGRO_A1>=1.83 || HIGRO_A2>=1.83){  //(HIGRO_A1>=1.10 || HIGRO_A2>=1.10)
+            if  (HIGRO_A1>=1.83 && HIGRO_A2>=1.83){ //(HIGRO_A1>=1.10 && HIGRO_A2>=1.10)
+                media = 1200;
+              }
+            else {
+                media = 2400;
+              }
+            aviso = "Nível de Umidade Médio";
+            digitalWrite(LED1, LOW);
+            digitalWrite(LED2, LOW);
+            unsigned long tempoIrrigacao = millis();          //millis inicia contagem
+            if  (tempoIrrigacao - previousIrrigacao >= media*1000) { //se millis - tempo anterior >= 1200s ou 2400 - 20 min ou 40 min ele entra no if, ou seja, o if será true a cada 60s
+                previousIrrigacao = tempoIrrigacao; 
+                TEMPO = 5;  //tempo com a válvula ligada
+                AcionaValvula();
+              }
+          }
+        else  {
+            //Se a leitura for menor que 1.10V podemos definir nível aceitável de umidade, logo não se deve regar
+            if  (HIGRO_A1<1.83 && HIGRO_A2<1.83){  //(HIGRO_A1<1.10 && HIGRO_A2<1.10) teste 3.3- 1.1 / 3 = 0,73
+                aviso = "Nível de Umidade Alto";
+                digitalWrite(LED1, HIGH);
+                digitalWrite(LED2, LOW);
+              }
+            else {
+                  sistema = "Erro! Sensores de umidade do solo com resultados inconclusivos";  
+                  Serial.println (sistema);
+              }
+          }
+      }
+  Serial.println (aviso);   
+  Serial.println (aviso2);
+  sendSensor(); 
+  //TAGO IO
+    unsigned long currentMillis = millis();          //millis inicia contagem
+    if  (currentMillis - previousMillis >= 60*1000) { //) || (irrigacao == 4) //se millis - tempo anterior >= 5 min ele entra no if, ou seja, o if será true a cada 60s
+        previousMillis = currentMillis;
+        SerializeAndPublish();
+        irrigacao = 0; //zera depois de publicar o status de irrigação no grafico
+      }      
+  }
