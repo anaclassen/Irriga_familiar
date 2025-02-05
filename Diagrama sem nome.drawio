@@ -66,7 +66,7 @@
         <mxCell id="slElvlwrPj6UMaKqWzpb-31" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-28" target="slElvlwrPj6UMaKqWzpb-30">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="slElvlwrPj6UMaKqWzpb-28" value="Lê o microfone e exibe no serial" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="slElvlwrPj6UMaKqWzpb-28" value="Lê o microfone e exibe valor na serial" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="310" y="400" width="86" height="60" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-33" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#18861F;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-30" target="slElvlwrPj6UMaKqWzpb-32">
