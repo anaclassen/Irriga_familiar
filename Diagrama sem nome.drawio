@@ -27,7 +27,7 @@
         <mxCell id="slElvlwrPj6UMaKqWzpb-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#18861F;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-10" target="slElvlwrPj6UMaKqWzpb-12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="slElvlwrPj6UMaKqWzpb-23" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF0000;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-10" target="slElvlwrPj6UMaKqWzpb-22">
+        <mxCell id="slElvlwrPj6UMaKqWzpb-23" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-10" target="slElvlwrPj6UMaKqWzpb-22">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-10" value="Botão B foi pressionado?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -72,7 +72,7 @@
         <mxCell id="slElvlwrPj6UMaKqWzpb-33" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#18861F;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-30" target="slElvlwrPj6UMaKqWzpb-32">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="slElvlwrPj6UMaKqWzpb-36" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF0000;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-30" target="slElvlwrPj6UMaKqWzpb-35">
+        <mxCell id="slElvlwrPj6UMaKqWzpb-36" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-30" target="slElvlwrPj6UMaKqWzpb-35">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-30" value="Leitura maior&amp;nbsp;&lt;div&gt;que 2100?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -149,6 +149,14 @@
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-61" value="" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#18861F;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-58" target="slElvlwrPj6UMaKqWzpb-60">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="slElvlwrPj6UMaKqWzpb-77" style="edgeStyle=orthogonalEdgeStyle;shape=connector;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;" edge="1" parent="1" source="slElvlwrPj6UMaKqWzpb-58" target="slElvlwrPj6UMaKqWzpb-64">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="724" />
+              <mxPoint x="110" y="724" />
+            </Array>
+          </mxGeometry>
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-58" value="Buzzer está inativo?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="190" y="620" width="100" height="93.75" as="geometry" />
