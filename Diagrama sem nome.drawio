@@ -37,7 +37,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-12" value="Ativa microfone" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="200" y="260" width="90" height="60" as="geometry" />
+          <mxGeometry x="200" y="260" width="80" height="60" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-14" value="Sim" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;" vertex="1" parent="1">
           <mxGeometry x="150" y="260" width="40" height="30" as="geometry" />
@@ -163,7 +163,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-60" value="Liga Buzzer" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="323" y="633.43" width="60" height="66.88" as="geometry" />
+          <mxGeometry x="319" y="633.4399999999999" width="60" height="66.88" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-62" value="Sim" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;" vertex="1" parent="1">
           <mxGeometry x="283" y="633.4300000000001" width="40" height="30" as="geometry" />
@@ -199,8 +199,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="slElvlwrPj6UMaKqWzpb-67" value="Zera tempo contado e desliga Buzzer" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="190" y="759.06" width="90" height="63.13" as="geometry" />
+        <mxCell id="slElvlwrPj6UMaKqWzpb-67" value="Zera tempo e desliga Buzzer" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="760.16" width="80" height="60.94" as="geometry" />
         </mxCell>
         <mxCell id="slElvlwrPj6UMaKqWzpb-69" value="Sim" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;" vertex="1" parent="1">
           <mxGeometry x="150" y="759.0600000000001" width="40" height="30" as="geometry" />
